@@ -1,0 +1,337 @@
+{% extends "core/base2.html" %}
+{% block title %}Profile Settings{% endblock %}
+{% block content %}
+{% load static %}
+
+
+    <div class="col-lg-9 col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">Profile</h1>
+                <div class="text-muted">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    {{ "now"|date:"F d, Y" }}
+                </div>
+            </div>
+
+        
+        <!-- Profile Form -->
+   <div class="profile-header">
+            <h1>Profile Settings</h1>
+            <p>Manage your account information and preferences</p>
+        </div>
+<form method="post" action="{% url 'accounts:edit_profile' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="profile-body">
+        <!-- Profile Picture Card -->
+        <div class="profile-card profile-pic-card">
+            {% if profile.profile_picture %}
+                <img src="{{ profile.profile_picture.url }}" class="avatar" alt="{{ user.first_name }} {{ user.last_name }}">
+            {% else %}
+                <div class="avatar">{{ user.first_name }} {{ user.last_name }}</div>
+            {% endif %}
+            <label class="change-photo-btn">
+                Change Photo
+                <input type="file" name="profile_picture" style="display:none;">
+            </label>
+            <p>Upload a professional photo to help families recognize you</p>
+        </div>
+
+        <!-- Profile Info Cards -->
+        <div class="profile-info-cards">
+            <!-- Basic Information -->
+            <div class="profile-card">
+                <h2>Basic Information</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" value="{{ user.first_name }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" value="{{ user.last_name }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" value="{{ user.email }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" name="phone_number" value="{{ user.phone_number }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conditional Profile Fields -->
+            {% if user.user_type == 'customer' %}
+            <div class="profile-card">
+                <h2>Details</h2>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea name="address">{{ profile.address }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Emergency Contact</label>
+                    <input type="text" name="emergency_contact" value="{{ profile.emergency_contact }}">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Number of Children</label>
+                        <input type="number" name="number_of_children" min="1" value="{{ profile.number_of_children }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Children Ages</label>
+                        <input type="text" name="children_ages" placeholder="e.g. 3, 6, 8" value="{{ profile.children_ages }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Special Needs</label>
+                    <textarea name="special_needs">{{ profile.special_needs }}</textarea>
+                </div>
+            </div>
+            {% elif user.user_type == 'caregiver' %}
+            <div class="profile-card">
+                <h2>Caregiver Details</h2>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea name="bio">{{ profile.bio }}</textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Years of Experience</label>
+                        <select name="years_of_experience">
+                            {% for key, label in profile.EXPERIENCE_CHOICES %}
+                                <option value="{{ key }}" {% if profile.years_of_experience == key %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Hourly Rate (Ksh)</label>
+                        <input type="number" step="0.01" name="hourly_rate" value="{{ profile.hourly_rate }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" name="location" value="{{ profile.location }}">
+                </div>
+                <div class="form-group">
+                    <label>Available</label>
+                    <input type="checkbox" name="available" {% if profile.available %}checked{% endif %}>
+                </div>
+                <div class="form-group">
+                    <label>Certifications</label>
+                    <textarea name="certifications">{{ profile.certifications }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Languages Spoken</label>
+                    <input type="text" name="languages" value="{{ profile.languages }}">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rating</label>
+                        <input type="text" value="{{ profile.rating }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Reviews</label>
+                        <input type="text" value="{{ profile.total_reviews }}" readonly>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Security -->
+            <div class="profile-card">
+                <h2>Security</h2>
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" name="current_password">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" name="new_password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm New Password</label>
+                        <input type="password" name="confirm_password">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="profile-actions">
+                <button type="submit" class="btn-primary">Save Changes</button>
+                <button type="button" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+    </section>
+       
+    </div>
+</div>
+
+</body>
+</html>
+<style>
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f7f8fa;
+    margin: 0;
+    padding: 0;
+}
+.profile-header {
+    text-align: center;
+    padding: 2rem 0 1rem 0;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+}
+.profile-header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    color: #333;
+}
+.profile-header p {
+    color: #666;
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+}
+.profile-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 2rem auto;
+    justify-content: center;
+}
+.profile-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 2rem;
+    min-width: 320px;
+    flex: 1 1 350px;
+    margin-bottom: 1.5rem;
+}
+.profile-pic-card {
+    max-width: 320px;
+    text-align: center;
+    align-self: flex-start;
+}
+.avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #888;
+    margin-bottom: 1rem;
+    object-fit: cover;
+}
+.change-photo-btn {
+    background: #f0f0f0;
+    border: none;
+    color: #333;
+    padding: 0.5rem 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+    transition: background 0.2s;
+}
+.change-photo-btn:hover {
+    background: #e0e0e0;
+}
+.profile-info-cards {
+    flex: 2 1 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.profile-card h2 {
+    margin-top: 0;
+    font-size: 1.3rem;
+    color: #2d3a4a;
+    margin-bottom: 1rem;
+}
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-bottom: 1rem;
+}
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    color: #444;
+}
+.form-group input,
+.form-group textarea {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 5px;
+    font-size: 1rem;
+    background: #fafbfc;
+    transition: border 0.2s;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+    border: 1.5px solid #4a90e2;
+    outline: none;
+}
+.form-group textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+.profile-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+.btn-primary {
+    background: #4a90e2;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 2rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.btn-primary:hover {
+    background: #357abd;
+}
+.btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+    border: none;
+    padding: 0.7rem 2rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+@media (max-width: 900px) {
+    .profile-body {
+        flex-direction: column;
+        align-items: center;
+    }
+    .profile-info-cards {
+        width: 100%;
+    }
+}
+</style>
+{%endblock %}

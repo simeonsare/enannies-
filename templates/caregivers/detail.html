@@ -1,0 +1,218 @@
+{# caregiver_profile.html #}
+{% extends "core/base2.html" %}
+{% load static %}
+
+{% block content %}
+    <div class="col-lg-9 col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0">{{ user.get_first_name }} {{ caregiver.user.last_name }} </h1>
+                <div class="text-muted">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    {{ "now"|date:"F d, Y" }}
+                </div>
+            </div>
+<div class="min-h-screen bg-gray-50">
+  {% if caregiver %}
+  <!-- Profile Header -->
+  <div class="bg-white shadow-soft">
+    <div class="container-max px-4 py-8">
+      <div class="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-8">
+        <!-- Avatar -->
+        <div class="flex-shrink-0">
+          {% if caregiver.profile_picture %}
+            <img src="{{ caregiver.profile_picture.url }}"
+                 alt="{{ caregiver.user.first_name }} {{ caregiver.user.last_name }}"
+                 class="w-32 h-32 rounded-full object-cover shadow-medium">
+          {% else %}
+            <img src="{% static 'default-avatar.jpg' %}"
+                 alt="{{ caregiver.user.first_name }} {{ caregiver.user.last_name }}"
+                 class="w-32 h-32 rounded-full object-cover shadow-medium">
+          {% endif %}
+          {% if caregiver.user.is_verified %}
+            <div class="flex items-center justify-center w-8 h-8 bg-green-500 rounded-full -mt-8 ml-24 border-4 border-white">
+              <span class="material-icons text-white text-sm">check</span>
+            </div>
+          {% endif %}
+        </div>
+        
+        <!-- Profile Info -->
+        <div class="flex-1">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                {{ caregiver.user.first_name }} {{ caregiver.user.last_name }}
+              </h1>
+              <p class="text-gray-600 flex items-center mb-2">
+                <span class="material-icons text-sm mr-2">location_on</span>
+                {{ caregiver.location }}
+              </p>
+              <div class="flex items-center space-x-4 mb-4">
+                <div class="flex items-center">
+                  <span class="material-icons text-yellow-400 mr-1">star</span>
+                  <span class="font-semibold">{{ caregiver.rating }}</span>
+                  <span class="text-gray-500 ml-1">({{ caregiver.total_reviews }} reviews)</span>
+                </div>
+                <span class="text-gray-400">•</span>
+                <span class="text-gray-600">{{ caregiver.get_years_of_experience_display }}</span>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-3xl font-bold text-primary-600 mb-2">
+                KSh {{ caregiver.hourly_rate }}/hr
+                            </div>
+              {% if caregiver_id %}
+                  <a href="{% url 'booking:create' caregiver_id %}">Create Booking</a>
+              {% endif %}
+                          </div>
+                        </div>
+          
+          <!-- Languages -->
+          <div class="flex items-center space-x-2 mb-4">
+            <span class="material-icons text-gray-600">language</span>
+            <span class="text-gray-700">
+              Languages: {{ caregiver.languages }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Profile Content -->
+  <div class="container-max px-4 py-8">
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- About -->
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">About {{ caregiver.user.first_name }}</h2>
+          <p class="text-gray-700 leading-relaxed">{{ caregiver.bio }}</p>
+        </div>
+        
+        <!-- Skills -->
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">Skills & Services</h2>
+          <div class="flex flex-wrap gap-3">
+          {% for skill in caregiver.certifications_list %}
+            <span class="badge badge-info">{{ skill }}</span>
+          {% empty %}
+            <span class="text-gray-500">No skills listed.</span>
+          {% endfor %}
+          </div>
+        </div>
+        
+        <!-- Certifications -->
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4">Certifications</h2>
+          <div class="space-y-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <span class="material-icons text-green-600 text-sm">verified</span>
+              </div>
+              <span class="text-gray-700">{{ cert }}</span>
+            </div>
+              <span class="text-gray-500">No certifications listed.</span>
+          </div>
+        </div>
+        
+        <!-- Reviews -->
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-6">Reviews ({{ caregiver.total_reviews }})</h2>
+          <div class="space-y-6">
+            {% if reviews %}
+              {% for review in reviews %}
+              <div class="border-b border-gray-200 pb-6 last:border-b-0">
+                <div class="flex items-start space-x-4">
+                  <img src="{{ review.reviewer_avatar_url|default:'https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=100' }}"
+                       alt="{{ review.reviewer_name|default:'Reviewer' }}"
+                       class="w-12 h-12 rounded-full object-cover">
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-2">
+                      <h4 class="font-medium">{{ review.reviewer_name }}</h4>
+                      <div class="flex items-center">
+                        {% for i in "12345"|slice:":review.rating" %}
+                          <span class="material-icons text-yellow-400 text-sm">star</span>
+                        {% endfor %}
+                      </div>
+                      <span class="text-gray-500 text-sm">{{ review.date_posted|timesince }} ago</span>
+                    </div>
+                    <p class="text-gray-700">
+                      {{ review.comment }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <span class="text-gray-500">No reviews yet.</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Availability -->
+        <div class="card">
+          <h3 class="text-lg font-semibold mb-4">Availability</h3>
+          <div class="space-y-2">
+            {% if caregiver.availability %}
+              {% for slot in caregiver.availability.all %}
+              <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                <span class="text-gray-700">{{ slot.day_name }}</span>
+                <span class="text-gray-600">{{ slot.start_time }} - {{ slot.end_time }}</span>
+              </div>
+              {% endfor %}
+            {% else %}
+              <span class="text-gray-500">No availability set.</span>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="card">
+          <h3 class="text-lg font-semibold mb-4">Quick Stats</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Response Rate</span>
+              <span class="font-medium">{{ caregiver.response_rate|default:"98%" }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Response Time</span>
+              <span class="font-medium">{{ caregiver.response_time|default:"Within 1 hour" }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Repeat Clients</span>
+              <span class="font-medium">{{ caregiver.repeat_clients|default:"85%" }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contact -->
+        <div class="card">
+          <h3 class="text-lg font-semibold mb-4">Contact</h3>
+          <div class="space-y-3">
+            <a href="" class="w-full btn-secondary flex items-center justify-center">
+              <span class="material-icons mr-2">message</span>
+              Send Message
+            </a>
+            <a href="" class="w-full btn-primary text-center block flex items-center justify-center">
+              <span class="material-icons mr-2">event</span>
+              Book Appointment
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- Loading State -->
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+      <p class="text-gray-600">Loading caregiver profile...</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
